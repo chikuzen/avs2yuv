@@ -100,7 +100,7 @@ add_outfile:
 		"-slave\tread a list of frame numbers from stdin (one per line)\n"
                 "-raw\toutputs raw I420 instead of yuv4mpeg\n"
 		"The outfile may be \"-\", meaning stdout.\n"
-		"Output format is yuv4mpeg, as used by MPlayer and mjpegtools\n"
+		"Output format is yuv4mpeg, as used by MPlayer, FFmpeg, Libav, x264 and mjpegtools\n"
 		"Huffyuv output requires ffmpeg, and probably doesn't work in Wine.\n"
 		);
 		return 2;
@@ -170,7 +170,7 @@ add_outfile:
 		for(i=0; i<out_fhs; i++) {
 			if(!y4m_headers[i])
 				continue;
-			fprintf(out_fh[i], "YUV4MPEG2 W%d H%d F%ld:%ld Ip A0:0\n",
+			fprintf(out_fh[i], "YUV4MPEG2 W%d H%d F%ld:%ld Ip A0:0 C420mpeg2\n",
 				inf.width, inf.height, inf.fps_numerator, inf.fps_denominator);
 			fflush(out_fh[i]);
 		}
