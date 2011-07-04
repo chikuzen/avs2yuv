@@ -6,12 +6,13 @@
 // (at your option) any later version.
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <windows.h>
 #include <io.h>
 #include <fcntl.h>
 #include <memory>
 #include "avisynth.h"
+
+#pragma warning(disable:4996)
 
 #ifdef _MSC_VER
 // what's up with MS's std libs?
@@ -48,7 +49,7 @@ int __cdecl main(int argc, const char* argv[])
 	int frm = -1;
 	int i;
 	int write_target = 0; // how many bytes per frame we expect to write
-	
+
 	for(i=1; i<argc; i++) {
 		if(argv[i][0] == '-' && argv[i][1] != 0) {
 			if(!strcmp(argv[i], "-v"))
@@ -113,7 +114,7 @@ add_outfile:
 			= (IScriptEnvironment*(*)(int)) GetProcAddress(avsdll, "CreateScriptEnvironment");
 		if(!CreateScriptEnvironment)
 			{fprintf(stderr, "failed to load CreateScriptEnvironment()\n"); return 1;}
-	
+
 		std::auto_ptr<IScriptEnvironment> env(CreateScriptEnvironment(AVISYNTH_INTERFACE_VERSION));
 		AVSValue arg(infile);
 		AVSValue res = env->Invoke("Import", AVSValue(&arg, 1));
@@ -121,7 +122,7 @@ add_outfile:
 			{fprintf(stderr, "Error: '%s' didn't return a video clip.\n", infile); return 1;}
 		PClip clip = res.AsClip();
 		VideoInfo inf = clip->GetVideoInfo();
-	
+
 		fprintf(stderr, "%s: %dx%d, ", infile, inf.width, inf.height);
 		if(inf.fps_denominator == 1)
 			fprintf(stderr, "%d fps, ", inf.fps_numerator);
@@ -199,7 +200,7 @@ add_outfile:
 			}
 
 			PVideoFrame f = clip->GetFrame(frm, env.get());
-	
+
 			if(out_fhs) {
 				static const int planes[] = {PLANAR_Y, PLANAR_U, PLANAR_V};
 				int wrote = 0;
@@ -229,7 +230,7 @@ add_outfile:
 						fflush(out_fh[i]);
 				}
 			}
-			
+
 			if(verbose)
 				fprintf(stderr, "%d\n", frm);
 		}
