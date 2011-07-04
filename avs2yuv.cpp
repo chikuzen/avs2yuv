@@ -10,6 +10,7 @@
 #include <string.h>
 #include <io.h>
 #include <fcntl.h>
+#include <memory>
 #include "avisynth.h"
 
 #ifdef _MSC_VER
@@ -113,7 +114,7 @@ add_outfile:
 		if(!CreateScriptEnvironment)
 			{fprintf(stderr, "failed to load CreateScriptEnvironment()\n"); return 1;}
 	
-		IScriptEnvironment* env = CreateScriptEnvironment(AVISYNTH_INTERFACE_VERSION);
+		std::auto_ptr<IScriptEnvironment> env(CreateScriptEnvironment(AVISYNTH_INTERFACE_VERSION));
 		AVSValue arg(infile);
 		AVSValue res = env->Invoke("Import", AVSValue(&arg, 1));
 		if(!res.IsClip())
@@ -197,7 +198,7 @@ add_outfile:
 					frm = inf.num_frames-1;
 			}
 
-			PVideoFrame f = clip->GetFrame(frm, env);
+			PVideoFrame f = clip->GetFrame(frm, env.get());
 	
 			if(out_fhs) {
 				static const int planes[] = {PLANAR_Y, PLANAR_U, PLANAR_V};
