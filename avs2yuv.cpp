@@ -101,7 +101,7 @@ add_outfile:
                 "-raw\toutputs raw I420 instead of yuv4mpeg\n"
 		"The outfile may be \"-\", meaning stdout.\n"
 		"Output format is yuv4mpeg, as used by MPlayer and mjpegtools\n"
-		"Huffyuv output requires MEncoder, and probably doesn't work in Wine.\n"
+		"Huffyuv output requires ffmpeg, and probably doesn't work in Wine.\n"
 		);
 		return 2;
 	}
@@ -158,10 +158,10 @@ add_outfile:
 		}
 		if(hfyufile) {
 			char *cmd = new char[100+strlen(hfyufile)];
-			sprintf(cmd, "mencoder - -o \"%s\" -quiet -ovc lavc -lavcopts vcodec=ffvhuff:vstrict=-1:pred=2:context=1", hfyufile);
+			sprintf(cmd, "ffmpeg -loglevel quiet -y -i - -vcodec ffvhuff -an -f avi \"%s\"", hfyufile);
 			out_fh[out_fhs] = popen(cmd, "wb");
 			if(!out_fh[out_fhs])
-				{fprintf(stderr, "failed to exec mencoder\n"); return 1;}
+				{fprintf(stderr, "failed to exec ffmpeg\n"); return 1;}
 			y4m_headers[out_fhs] = 1;
 			out_fhs++;
 			delete [] cmd;
