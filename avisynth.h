@@ -46,7 +46,7 @@ enum { AVISYNTH_INTERFACE_VERSION = 2 };
    Moved from internal.h */
 
 // Win32 API macros, notably the types BYTE, DWORD, ULONG, etc. 
-#include <windef.h>  
+#include <windows.h>  
 
 // COM interface macros
 #include <objbase.h>
@@ -55,7 +55,7 @@ enum { AVISYNTH_INTERFACE_VERSION = 2 };
 #define in64 (__int64)(unsigned short)
 typedef unsigned long	Pixel;    // this will break on 64-bit machines!
 typedef unsigned long	Pixel32;
-typedef unsigned char Pixel8;
+typedef unsigned char	Pixel8;
 typedef long			PixCoord;
 typedef	long			PixDim;
 typedef	long			PixOffset;
@@ -80,7 +80,6 @@ typedef	long			PixOffset;
   #define _RPT4(a,b,c,d,e,f) ((void)0)
   
   #define _ASSERTE(x) assert(x)
-  #define _ASSERT(x) assert(x)
   #include <assert.h>
 #endif
 
@@ -309,8 +308,8 @@ class VideoFrame {
   const int offset, pitch, row_size, height, offsetU, offsetV, pitchUV;  // U&V offsets are from top of picture.
 
   friend class PVideoFrame;
-  void AddRef() { InterlockedIncrement((long *)&refcount); }
-  void Release() { if (refcount==1) InterlockedDecrement(&vfb->refcount); InterlockedDecrement((long *)&refcount); }
+  void AddRef() { ++refcount; }
+  void Release() { if (refcount==1) --vfb->refcount; --refcount; }
 
   friend class ScriptEnvironment;
   friend class Cache;
@@ -318,7 +317,7 @@ class VideoFrame {
   VideoFrame(VideoFrameBuffer* _vfb, int _offset, int _pitch, int _row_size, int _height);
   VideoFrame(VideoFrameBuffer* _vfb, int _offset, int _pitch, int _row_size, int _height, int _offsetU, int _offsetV, int _pitchUV);
 
-  void* operator new(unsigned size);
+  void* operator new (size_t size);
 // TESTME: OFFSET U/V may be switched to what could be expected from AVI standard!
 public:
   int GetPitch() const { return pitch; }
@@ -378,7 +377,7 @@ public:
     return vfb->data + GetOffset(plane);
   }
 
-  ~VideoFrame() { InterlockedDecrement(&vfb->refcount); }
+  ~VideoFrame() { --vfb->refcount; }
 };
 
 enum {
@@ -392,8 +391,8 @@ class IClip {
   friend class PClip;
   friend class AVSValue;
   int refcnt;
-  void AddRef() { InterlockedIncrement((long *)&refcnt); }
-  void Release() { InterlockedDecrement((long *)&refcnt); if (!refcnt) delete this; }
+  void AddRef() { ++refcnt; }
+  void Release() { if (!--refcnt) delete this; }
 public:
   IClip() : refcnt(0) {}
 
@@ -519,7 +518,6 @@ public:
   const char* AsString(const char* def) const { _ASSERTE(IsString()||!Defined()); return IsString() ? string : def; }
 
   int ArraySize() const { _ASSERTE(IsArray()); return IsArray()?array_size:1; }
-
   const AVSValue& operator[](int index) const {
     _ASSERTE(IsArray() && index>=0 && index<array_size);
     return (IsArray() && index>=0 && index<array_size) ? array[index] : *this;
@@ -609,7 +607,6 @@ public:
   static PClip Create(PClip clip, int sample_type, int prefered_type);
   static AVSValue __cdecl Create_float(AVSValue args, void*, IScriptEnvironment*);
   static AVSValue __cdecl Create_32bit(AVSValue args, void*, IScriptEnvironment*);
-  static AVSValue __cdecl Create_24bit(AVSValue args, void*, IScriptEnvironment*);
   static AVSValue __cdecl Create_16bit(AVSValue args, void*, IScriptEnvironment*);
   static AVSValue __cdecl Create_8bit(AVSValue args, void*, IScriptEnvironment*);
   virtual ~ConvertAudio()

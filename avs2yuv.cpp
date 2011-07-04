@@ -10,7 +10,7 @@
 #include <string.h>
 #include <io.h>
 #include <fcntl.h>
-#include "internal.h"
+#include "avisynth.h"
 
 #ifdef _MSC_VER
 // what's up with MS's std libs?
@@ -27,7 +27,7 @@
 #define INT_MAX 0x7fffffff
 #endif
 
-#define MY_VERSION "Avs2YUV 0.24"
+#define MY_VERSION "Avs2YUV 0.24m"
 #define MAX_FH 10
 
 int __cdecl main(int argc, const char* argv[])
