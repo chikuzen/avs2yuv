@@ -1,3 +1,7 @@
+0.24m (2011-7-4)
+fixed crash on Windows7 x64 when closing process.
+changed the tool for -hfyu from mencoder to ffmpeg.
+
 0.24 (2005-3-4)
 new option: -raw outputs raw I420 (omits yuv4mpeg headers)
 
